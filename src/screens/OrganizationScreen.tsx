@@ -73,12 +73,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    width: 250,
-    height: 70,
+    width: 300,
+    height: 80,
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 15,
-    borderRadius: 35,
+    borderRadius: 40,
     overflow: 'hidden',
   },
   gradient: {
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    fontSize: 20,
+    fontSize: 22,
     color: 'white',
     fontWeight: 'bold',
   },
