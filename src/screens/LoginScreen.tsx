@@ -1,13 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import nacl from 'tweetnacl';
+import 'react-native-get-random-values';
+import base58 from 'bs58';
 
 const LoginScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [dappKeyPair, setDappKeyPair] = useState<nacl.BoxKeyPair | null>(null);
   const navigation = useNavigation();
 
+  useEffect(() => {
+    const generateRandomKeyPair = () => {
+      try {
+        const newKeyPair = nacl.box.keyPair();
+        setDappKeyPair(newKeyPair);
+      } catch (error) {
+        console.error('Error generating random key pair:', error);
+      }
+    };
+  
+    generateRandomKeyPair();
+  }, []);
+
+  const handleConnectPhantom = async () => {
+    if (dappKeyPair) {
+      const params = new URLSearchParams({
+        dapp_encryption_public_key: base58.encode(dappKeyPair.publicKey),
+        cluster: 'mainnet-beta',
+        app_url: 'https://phantom.app',
+        redirect_link: 'myapp://onConnect',
+      });
+
+      const connectUrl = `phantom://v1/connect?${params.toString()}`;
+
+      try {
+        await Linking.openURL(connectUrl);
+      } catch (error) {
+        console.error('Error connecting to Phantom:', error);
+      }
+    }
+  };
  
   return (
     <LinearGradient colors={['#03001C', '#27005D', '#190482']} style={styles.linearGradient}>
@@ -40,9 +75,9 @@ const LoginScreen = () => {
                 }}>
                 <Text style={styles.modalOptionText}>Create a New Wallet</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.modalOption} onPress={() => navigation.navigate("ConnectPhantomScreen") }>
-                  <Text style={styles.modalOptionText}>I Already Have a Wallet</Text>
-                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalOption} onPress={handleConnectPhantom}>
+                <Text style={styles.modalOptionText}>I Have a Already Wallet</Text>
+        </TouchableOpacity>
               </View>
             </View>
           </View>
