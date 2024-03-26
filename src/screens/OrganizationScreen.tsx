@@ -1,40 +1,66 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import React from 'react';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
-type RootStackParamList = {
-  OrganizationScreen: { userPublicKey: Uint8Array };
+interface ButtonProps {
+  onPress: (voteNumber: number) => void;
+  voteNumber: number;
+  text: string;
+}
+
+interface OrganizationScreenProps {
+  userPublicKey: Uint8Array;
+}
+
+// Adjusted gradient colors for a more vibrant mix of purple and blue
+const solanaGradientColors = ['#A770EF', '#CF8BF3', '#FDB99B', '#81D4FA', '#00B0FF']; // A rich gradient from purple to blue
+
+const CustomButton: React.FC<ButtonProps> = ({ onPress, voteNumber, text }) => {
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    onPress(voteNumber);
+    navigation.navigate('VotingDetailScreen');
+  };
+
+  return (
+    <TouchableOpacity onPress={handlePress} style={styles.button}>
+      <LinearGradient colors={solanaGradientColors} style={styles.gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+        <Text style={styles.buttonText}>{text}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
 };
 
-type OrganizationScreenRouteProp = RouteProp<RootStackParamList, 'OrganizationScreen'>;
-
-const OrganizationScreen: React.FC = () => {
-  const [organizationPublicKey, setOrganizationPublicKey] = useState('');
-  const navigation = useNavigation();
-  const route = useRoute<OrganizationScreenRouteProp>();
-  const userPublicKey = route.params?.userPublicKey || new Uint8Array();
-
-  const handleRegister = () => {
-    // Kullanıcının girdiği ve önceki ekrandan gelen public key'leri kullanarak kayıt işlemini gerçekleştir
-    console.log('User Public Key:', userPublicKey);
-    console.log('Organization Public Key:', organizationPublicKey);
-    // Kayıt işlemini gerçekleştirdikten sonra uygun navigasyonu yapabilirsiniz
+const OrganizationScreen: React.FC<OrganizationScreenProps> = ({ userPublicKey }) => {
+  const handleButtonPress = (voteNumber: number) => {
+    console.log('Pressed Vote', voteNumber);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Your Public Key:</Text>
-      <Text style={styles.publicKey}>{userPublicKey}</Text>
-      <Text style={styles.label}>Enter Organization's Public Key:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Organization's Public Key"
-        onChangeText={setOrganizationPublicKey}
-        value={organizationPublicKey}
+      <CustomButton
+        onPress={handleButtonPress}
+        voteNumber={1}
+        text="Vote for Option 1"
       />
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
+      <CustomButton
+        onPress={handleButtonPress}
+        voteNumber={2}
+        text="Vote for Option 2"
+      />
+      <CustomButton
+        onPress={handleButtonPress}
+        voteNumber={3}
+        text="Vote for Option 3"
+      />
+      {/* Adding a new button */}
+      <CustomButton
+        onPress={handleButtonPress}
+        voteNumber={4}
+        text="Vote for Option 4"
+      />
     </View>
   );
 };
@@ -42,34 +68,29 @@ const OrganizationScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-  },
-  label: {
-    fontSize: 18,
-    marginBottom: 5,
-  },
-  publicKey: {
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  input: {
-    width: '80%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
+    alignItems: 'center',
+    backgroundColor: '#F2F2F2',
   },
   button: {
-    backgroundColor: '#36008D',
-    padding: 10,
-    borderRadius: 5,
+    width: 250, // Increased width for bigger buttons
+    height: 70, // Increased height for a more modern and prominent look
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 15, // Adjust spacing between buttons
+    borderRadius: 35, // More pronounced rounded edges
+    overflow: 'hidden', // Keep the gradient within the button border
+  },
+  gradient: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    fontSize: 20, // Slightly larger text for better readability
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
