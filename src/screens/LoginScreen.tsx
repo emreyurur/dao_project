@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Image,Linking} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Image, Linking, TextInput } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import nacl from 'tweetnacl';
 import base58 from 'bs58';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { encode } from 'bs58';
 
-const Stack=createNativeStackNavigator();
+const Stack = createNativeStackNavigator();
 
 interface KeyPair {
   publicKey: Uint8Array;
@@ -35,7 +36,7 @@ const LoginScreen: React.FC = () => {
     if (dappKeyPair) {
       const params = new URLSearchParams({
         dapp_encryption_public_key: base58.encode(dappKeyPair.publicKey),
-        cluster: 'mainnet-beta',
+        cluster: 'devnet',
         app_url: 'https://phantom.app',
         redirect_link: 'myapp://onConnect',
       });
@@ -44,21 +45,44 @@ const LoginScreen: React.FC = () => {
 
       try {
         await Linking.openURL(connectUrl);
+        // Phantom cüzdan bağlandıktan sonra modalı kapat
+        setModalVisible(false);
+        // Cüzdanın publicKey'sini sunucuya gönderme
+        await saveWalletPublicKey(dappKeyPair.publicKey);
         // Phantom cüzdan bağlandıktan sonra uygulamanın OrganizationScreen ekranına yönlendirme
-        navigation.navigate("OrganizationScreen");
+        navigation.navigate("OrganizationScreen", { userPublicKey: dappKeyPair.publicKey });
       } catch (error) {
         console.error('Error connecting to Phantom:', error);
       }
     }
   };
 
+  const saveWalletPublicKey = async (publicKey: Uint8Array) => {
+    try {
+      // Public key'i base58 ile kodlayıp bir stringe dönüştür
+      const publicKeyString = encode(publicKey);
+
+      const response = await fetch('http://192.168.107.244:3000/createUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ public_key: publicKeyString }), // String olarak gönder
+      });
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error('Error saving wallet public key:', error);
+    }
+  };
+
   return (
-    <LinearGradient colors={['#03001C', '#27005D', '#190482']} style={styles.linearGradient}>
+    <LinearGradient colors={['#ACE2E1', '#F7EEDD']} style={styles.linearGradient}>
       <View style={styles.container}>
         <Image style={styles.daoLogo} source={require('../assets/dao_logo.png')} />
         <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
           <Image style={styles.phantomIcon} source={require('../assets/phantom_icon.png')} />
-          <Text style={styles.buttonText}>Connect your Phantom Wallet</Text>
+          <Text style={styles.buttonText}>Connect Phantom</Text>
         </TouchableOpacity>
         <Modal
           animationType="slide"
@@ -172,12 +196,12 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center', // Center the content horizontally
-    fontSize: 25, // Aynı font size
-  },
-  modalOptionText: {
+    fontSize: 25, // Aynı font boyutu
+    },
+    modalOptionText: {
     fontSize: 20,
     color: '#fff',
-  },
-});
-
-export default LoginScreen;
+    },
+    });
+    
+    export default LoginScreen;
