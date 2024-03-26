@@ -13,8 +13,9 @@ interface OrganizationScreenProps {
   userPublicKey: Uint8Array;
 }
 
-// Adjusted gradient colors for a more vibrant mix of purple and blue
-const solanaGradientColors = ['#A770EF', '#CF8BF3', '#FDB99B', '#81D4FA', '#00B0FF']; // A rich gradient from purple to blue
+// Renkler
+const buttonGradientColors = ['#B470FF', '#6E60FF']; // Açık mor ve mavi tonları
+const screenGradientColors = ['#ACE2E1', '#F7EEDD']; // Ekran arka planı renkleri
 
 const CustomButton: React.FC<ButtonProps> = ({ onPress, voteNumber, text }) => {
   const navigation = useNavigation();
@@ -26,7 +27,7 @@ const CustomButton: React.FC<ButtonProps> = ({ onPress, voteNumber, text }) => {
 
   return (
     <TouchableOpacity onPress={handlePress} style={styles.button}>
-      <LinearGradient colors={solanaGradientColors} style={styles.gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+      <LinearGradient colors={buttonGradientColors} style={styles.gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
         <Text style={styles.buttonText}>{text}</Text>
       </LinearGradient>
     </TouchableOpacity>
@@ -39,7 +40,7 @@ const OrganizationScreen: React.FC<OrganizationScreenProps> = ({ userPublicKey }
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={screenGradientColors} style={styles.container}>
       <CustomButton
         onPress={handleButtonPress}
         voteNumber={1}
@@ -61,7 +62,7 @@ const OrganizationScreen: React.FC<OrganizationScreenProps> = ({ userPublicKey }
         voteNumber={4}
         text="Vote for Option 4"
       />
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -70,16 +71,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F2F2F2',
   },
   button: {
-    width: 250, // Increased width for bigger buttons
-    height: 70, // Increased height for a more modern and prominent look
+    width: 250,
+    height: 70,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 15, // Adjust spacing between buttons
-    borderRadius: 35, // More pronounced rounded edges
-    overflow: 'hidden', // Keep the gradient within the button border
+    marginVertical: 15,
+    borderRadius: 35,
+    overflow: 'hidden',
   },
   gradient: {
     width: '100%',
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    fontSize: 20, // Slightly larger text for better readability
+    fontSize: 20,
     color: 'white',
     fontWeight: 'bold',
   },
