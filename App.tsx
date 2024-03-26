@@ -10,13 +10,13 @@ const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
   return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="LoginScreen" component={LoginScreen} />
-          <Stack.Screen name="ConnectPhantomScreen" component={ConnectPhantomScreen}/>
-          <Stack.Screen name="OrganizatonScreen" component={OrganizationScreen}/>
-        </Stack.Navigator>
-      </NavigationContainer>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="LoginScreen" component={LoginScreen} />
+        <Stack.Screen name="ConnectPhantomScreen" component={ConnectPhantomScreen} />
+        <Stack.Screen name="OrganizationScreen" component={OrganizationScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

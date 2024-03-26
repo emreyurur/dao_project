@@ -1,27 +1,33 @@
-import React, { useState,useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Image,Linking} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import nacl from 'tweetnacl';
-import 'react-native-get-random-values';
 import base58 from 'bs58';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-const LoginScreen = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [dappKeyPair, setDappKeyPair] = useState<nacl.BoxKeyPair | null>(null);
+const Stack=createNativeStackNavigator();
+
+interface KeyPair {
+  publicKey: Uint8Array;
+  secretKey: Uint8Array;
+}
+
+const LoginScreen: React.FC = () => {
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [dappKeyPair, setDappKeyPair] = useState<KeyPair | null>(null);
   const navigation = useNavigation();
 
   useEffect(() => {
     const generateRandomKeyPair = () => {
       try {
-        const newKeyPair = nacl.box.keyPair();
+        const newKeyPair: KeyPair = nacl.box.keyPair();
         setDappKeyPair(newKeyPair);
       } catch (error) {
         console.error('Error generating random key pair:', error);
       }
     };
-  
+
     generateRandomKeyPair();
   }, []);
 
@@ -38,18 +44,20 @@ const LoginScreen = () => {
 
       try {
         await Linking.openURL(connectUrl);
+        // Phantom cüzdan bağlandıktan sonra uygulamanın OrganizationScreen ekranına yönlendirme
+        navigation.navigate("OrganizationScreen");
       } catch (error) {
         console.error('Error connecting to Phantom:', error);
       }
     }
   };
- 
+
   return (
     <LinearGradient colors={['#03001C', '#27005D', '#190482']} style={styles.linearGradient}>
       <View style={styles.container}>
-      <Image style={styles.daoLogo} source={require('../assets/dao_logo.png')}/>
+        <Image style={styles.daoLogo} source={require('../assets/dao_logo.png')} />
         <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
-          <Image style={styles.phantomIcon} source={require('../assets/phantom_icon.png')}/>
+          <Image style={styles.phantomIcon} source={require('../assets/phantom_icon.png')} />
           <Text style={styles.buttonText}>Connect your Phantom Wallet</Text>
         </TouchableOpacity>
         <Modal
@@ -58,8 +66,7 @@ const LoginScreen = () => {
           visible={modalVisible}
           onRequestClose={() => {
             setModalVisible(!modalVisible);
-          }}
-        >
+          }}>
           <View style={styles.modalBackground}>
             <View style={styles.centeredView}>
               <TouchableOpacity style={styles.exitButton} onPress={() => setModalVisible(false)}>
@@ -71,13 +78,13 @@ const LoginScreen = () => {
                 <TouchableOpacity
                   style={styles.modalOption}
                   onPress={() => {
-                  Linking.openURL('https://phantom.app/');
-                }}>
-                <Text style={styles.modalOptionText}>Create a New Wallet</Text>
+                    Linking.openURL('https://phantom.app/');
+                  }}>
+                  <Text style={styles.modalOptionText}>Create a New Wallet</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.modalOption} onPress={handleConnectPhantom}>
-                <Text style={styles.modalOptionText}>I Have a Already Wallet</Text>
-        </TouchableOpacity>
+                  <Text style={styles.modalOptionText}>I Have a Already Wallet</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -91,9 +98,9 @@ const styles = StyleSheet.create({
   linearGradient: {
     flex: 1,
   },
-  daoLogo:{
-    height:500,
-    width:500,
+  daoLogo: {
+    height: 500,
+    width: 500,
   },
   container: {
     flex: 1,
@@ -115,11 +122,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 25,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: '#fff',
-    flexDirection: "row",
-    alignItems: "center",
-    textAlign:"center"
+    flexDirection: 'row',
+    alignItems: 'center',
+    textAlign: 'center',
   },
   modalBackground: {
     flex: 1,
@@ -165,6 +172,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center', // Center the content horizontally
+    fontSize: 25, // Aynı font size
   },
   modalOptionText: {
     fontSize: 20,
